@@ -1,0 +1,7 @@
+# Will exclude all .log files
+*.log
+
+# Will exclude any vim temporary files
+*.*~
+*.swp
+
