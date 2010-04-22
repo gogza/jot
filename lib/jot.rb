@@ -59,6 +59,97 @@ module Jot
     Dir.glob(search_me).sort.each {|rb| require rb}
   end
 
+  require 'net/http'
+  require 'rubygems'
+  require 'json'
+
+  class Jot
+    def initialize(output_buffer)
+      @output = output_buffer
+      @listProvider = ListProviderFactory.getProvider
+    end
+    def show_lists
+      lists = @listProvider.lists
+      lists.each {|item| @output.puts item }
+    end    
+  end
+
+  class ListProviderFactory
+    def self.getProvider
+      CheckvistListProvider.new(CheckvistProxy.new)
+    end
+  end
+
+  class CheckvistProxy
+
+    def initialize
+      @email = "mail.gordon.mcallister@gmail.com"
+      @api_key = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
+      @url = URI.parse("http://checkvist.com")
+    end
+
+    def getCheckLists
+      json_call Net::HTTP::Get.new("/checklists.json")
+    end
+
+    def json_call request, parameters = nil
+      request.basic_auth @email, @api_key if @email
+      request.set_form_data(parameters) if parameters
+    
+      res = Net::HTTP.start(@url.host, @url.port) { |http|
+        http.request(request)
+      }
+    
+      case res
+      when Net::HTTPSuccess
+        JSON.parse(res.body)
+      else
+        res.error!
+      end
+    end
+    
+
+  end
+
+  class CheckvistProxyMock
+
+    @@lists = []
+
+    def getCheckLists
+      @@lists.map {|list| Hash["name" => list] }
+    end
+
+    def self.add_list(list_name)
+      @@lists << list_name
+    end
+
+  end
+
+  class CheckvistListProvider
+    def initialize(proxy)
+      @proxy = proxy
+    end
+
+    def lists
+      lists = @proxy.getCheckLists
+      lists.map{|list| list["name"]}
+    end
+  end
+
+  class CheckvistProviderImpersonator
+    @@lists = []
+
+    def self.add_list(list_name)
+      @@lists << list_name
+    end
+
+    def lists
+      @@lists	    
+    end
+
+  end
+
+
 end  # module Jot
 
 Jot.require_all_libs_relative_to(__FILE__)

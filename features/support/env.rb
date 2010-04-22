@@ -1,0 +1,6 @@
+$: << File.join(File.dirname(__FILE__), "/../../lib" )
+require 'spec'
+require 'spec/expectations'
+require 'spec/mocks'
+require 'jot'
+

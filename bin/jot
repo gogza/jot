@@ -3,5 +3,5 @@
 require File.expand_path(
     File.join(File.dirname(__FILE__), %w[.. lib jot]))
 
-# Put your code here
-
+jot = Jot::Jot.new(STDOUT)
+jot.show_lists
