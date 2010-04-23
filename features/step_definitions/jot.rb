@@ -12,6 +12,10 @@ Given /^I have an existing list called "([^\"]*)" list$/ do |list_name|
 
 end
 
+Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
+  Jot::WorkSpace.currentList = list_name
+end
+
 When /^I ask to see the lists$/ do
   @output = StringIO.new
   jot = Jot::Jot.new(@output)
@@ -26,7 +30,12 @@ end
 Then /^jot should mark the "([^\"]*)" as current$/ do |list_name|
   lines = @output.string.split("\n")
   list_displayed = lines.select {|line| line.include?(list_name) }
-  list_displayed[0].should include(" * ")
+  list_displayed[0].should =~ /^ * /
 end
 
+Then /^jot should not mark the "([^\"]*)" as current$/ do |list_name|
+  lines = @output.string.split("\n")
+  list_displayed = lines.select {|line| line.include?(list_name) }
+  list_displayed[0].should =~ /^   /
+end
 

@@ -70,7 +70,10 @@ module Jot
     end
     def show_lists
       lists = @listProvider.lists
-      lists.each {|item| @output.puts " * " + item }
+      lists.each {|item| 
+        prefix = WorkSpace.isCurrentList?(item) ? " * " : "   " 
+	@output.puts prefix + item
+      }
     end    
   end
 
@@ -109,6 +112,16 @@ module Jot
     end
     
 
+  end
+
+  class WorkSpace
+   @@currentListName = ""
+   def self.currentList= listName
+     @@currentListName = listName	   
+   end
+   def self.isCurrentList? listName
+     @@currentListName == listName
+   end
   end
 
   class CheckvistProxyMock
