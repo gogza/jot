@@ -11,3 +11,11 @@ Feature: Viewer wants to see their lists
     Then jot should show the "Garden tasks" list
     And jot should show the "House tasks" list
 
+  Scenario: viewing a single list
+    Given I have to mock up a proxy for Checkvist
+    And I have an existing list called "Garden tasks" list
+    When I ask to see the lists
+    Then jot should show the "Garden tasks" list
+    And jot should mark the "Garden tasks" as current
+
+

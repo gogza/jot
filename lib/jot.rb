@@ -70,7 +70,7 @@ module Jot
     end
     def show_lists
       lists = @listProvider.lists
-      lists.each {|item| @output.puts item }
+      lists.each {|item| @output.puts " * " + item }
     end    
   end
 
@@ -114,6 +114,10 @@ module Jot
   class CheckvistProxyMock
 
     @@lists = []
+
+    def initialize
+      @@lists = []
+    end
 
     def getCheckLists
       @@lists.map {|list| Hash["name" => list] }

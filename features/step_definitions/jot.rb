@@ -19,6 +19,14 @@ When /^I ask to see the lists$/ do
 end
 
 Then /^jot should show the "([^\"]*)" list$/ do |list_name|
-  @output.string.split("\n").should include(list_name)
+  items_matching_list_name = @output.string.split("\n").select {|list| list =~ Regexp.new(list_name)}
+  items_matching_list_name.length.should == 1
 end
+
+Then /^jot should mark the "([^\"]*)" as current$/ do |list_name|
+  lines = @output.string.split("\n")
+  list_displayed = lines.select {|line| line.include?(list_name) }
+  list_displayed[0].should include(" * ")
+end
+
 

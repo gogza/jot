@@ -18,11 +18,11 @@ module Jot
 	@jot.show_lists
       end
       it "should show the garden list" do
-        @output.should_receive(:puts).with("Garden tasks")
+        @output.should_receive(:puts).with(/Garden tasks/)
 	@jot.show_lists
       end
       it "should show the house list" do
-        @output.should_receive(:puts).with("House tasks")
+        @output.should_receive(:puts).with(/House tasks/)
 	@jot.show_lists
       end
 
