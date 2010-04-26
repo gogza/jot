@@ -16,6 +16,10 @@ Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
   Jot::WorkSpace.currentList = list_name
 end
 
+Given /^none of the lists are marked as current$/ do
+  Jot::WorkSpace.clear
+end
+
 When /^I ask to see the lists$/ do
   @output = StringIO.new
   jot = Jot::Jot.new(@output)
@@ -30,12 +34,26 @@ end
 Then /^jot should mark the "([^\"]*)" as current$/ do |list_name|
   lines = @output.string.split("\n")
   list_displayed = lines.select {|line| line.include?(list_name) }
-  list_displayed[0].should =~ /^ * /
+  list_displayed[0].should =~ /^ \* /
 end
 
 Then /^jot should not mark the "([^\"]*)" as current$/ do |list_name|
   lines = @output.string.split("\n")
   list_displayed = lines.select {|line| line.include?(list_name) }
   list_displayed[0].should =~ /^   /
+end
+
+Then /^jot should mark the one of the lists as current$/ do
+  lines = @output.string.split("\n")
+  currentLines = lines.select {|line| line =~ /^ \* /}
+  currentLines.length.should == 1  
+end
+
+Then /^the jot workspace should have one list marked as current$/ do
+  lines = @output.string.split("\n")
+  listNames = lines.select {|line| 
+    Jot::WorkSpace.isCurrentList?(line.slice(3, line.length-3)) 
+  }
+  listNames.length.should == 1
 end
 

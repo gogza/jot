@@ -64,15 +64,33 @@ module Jot
   require 'json'
 
   class Jot
+
     def initialize(output_buffer)
       @output = output_buffer
       @listProvider = ListProviderFactory.getProvider
     end
     def show_lists
       lists = @listProvider.lists
-      lists.each {|item| 
-        prefix = WorkSpace.isCurrentList?(item) ? " * " : "   " 
-	@output.puts prefix + item
+
+      currentHasBeenFound = false
+      formattedLists = lists.map {|item|
+	if WorkSpace.isCurrentList?(item)
+          current = true
+	  currentHasBeenFound = true
+	else
+	  current = false	
+	end
+	Hash[:current => current, :name => item]
+      }
+
+      if !currentHasBeenFound
+        formattedLists[0][:current] = true
+	WorkSpace.currentList = formattedLists[0][:name]
+      end
+
+      formattedLists.each {|list| 
+	prefix = list[:current] ? " * " : "   "
+        @output.puts prefix + list[:name] 
       }
     end    
   end
@@ -116,6 +134,9 @@ module Jot
 
   class WorkSpace
    @@currentListName = ""
+   def self.clear
+     @@currentListName = ""
+   end
    def self.currentList= listName
      @@currentListName = listName	   
    end
