@@ -3,35 +3,41 @@ Feature: Viewer wants to see their lists
   I want to see my lists
   So that I can choose one to work on
 
-  Scenario: viewing multiple lists
+  Background:
     Given I have to mock up a proxy for Checkvist
-    And I have an existing list called "Garden tasks" list
-    And I have an existing list called "House tasks" list
+
+  Scenario: viewing multiple lists
+    Given I have an existing list with:
+     | name         |
+     | Garden tasks |
+     | House tasks  |
     And jot knows "Garden tasks" is the current list
     When I ask to see the lists
-    Then jot should show the "Garden tasks" list
-    And jot should show the "House tasks" list
+    Then jot should display the following lists:
+     | name         |
+     | Garden tasks |
+     | House tasks  |
     And jot should mark the "Garden tasks" as current 
     And jot should not mark the "House tasks" as current  
 
   Scenario: viewing a single list
-    Given I have to mock up a proxy for Checkvist
-    And I have an existing list called "Garden tasks" list
+    Given I have an existing list called "Garden tasks" list
     When I ask to see the lists
     Then jot should show the "Garden tasks" list
     And jot should mark the "Garden tasks" as current
 
   Scenario: viewing multiple lists when a current list is not set
-    Given I have to mock up a proxy for Checkvist
-    And I have an existing list called "Garden tasks" list
-    And I have an existing list called "House tasks" list
+    Given I have an existing list with:
+     | name         |
+     | Garden tasks |
+     | House tasks  |
     And none of the lists are marked as current
     When I ask to see the lists
-    Then jot should show the "Garden tasks" list
-    And jot should show the "House tasks" list
+    Then jot should display the following lists:
+     | name         |
+     | Garden tasks |
+     | House tasks  |
     And jot should mark the one of the lists as current
     And the jot workspace should have one list marked as current
-
-
 
 

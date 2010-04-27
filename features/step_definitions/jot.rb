@@ -5,6 +5,11 @@ Given /^I have to mock up a proxy for Checkvist$/ do
 
 end
 
+Given /^I have an existing list with:$/ do |table|
+
+  table.hashes.each {|hash| Jot::CheckvistProxyMock.add_list hash[:name] }
+
+end
 
 Given /^I have an existing list called "([^\"]*)" list$/ do |list_name|
 
@@ -24,6 +29,16 @@ When /^I ask to see the lists$/ do
   @output = StringIO.new
   jot = Jot::Jot.new(@output)
   jot.show_lists
+end
+
+When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
+  @output = StringIO.new
+  jot = Jot::Jot.new(@output)
+  jot.changeCurrentListTo list_name
+end
+
+Then /^jot should display the following lists:$/ do |table|
+  table.hashes.each{|hash| Then "jot should show the \"#{hash[:name]}\" list"}
 end
 
 Then /^jot should show the "([^\"]*)" list$/ do |list_name|
@@ -56,4 +71,14 @@ Then /^the jot workspace should have one list marked as current$/ do
   }
   listNames.length.should == 1
 end
+
+Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
+|list_name|
+  lines = @output.string.split("\n")
+  listNames = lines.select {|line| 
+    Jot::WorkSpace.isCurrentList?(line.slice(3, line.length-3)) 
+  }
+  listNames[0].should =~ Regexp.new(list_name)
+end
+
 

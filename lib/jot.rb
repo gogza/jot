@@ -69,11 +69,26 @@ module Jot
       @output = output_buffer
       @listProvider = ListProviderFactory.getProvider
     end
-    def show_lists
-      lists = @listProvider.lists
 
+    def show_lists
+      lists = getListsWithCurrentSet @listProvider.lists
+
+      lists.each {|list| 
+	prefix = list[:current] ? " * " : "   "
+        @output.puts prefix + list[:name] 
+      }
+    end
+
+    def changeCurrentListTo listName
+      WorkSpace.currentList = listName
+      show_lists
+    end
+
+    private
+
+    def getListsWithCurrentSet lists
       currentHasBeenFound = false
-      formattedLists = lists.map {|item|
+      listsWithCurrent = lists.map {|item|
 	if WorkSpace.isCurrentList?(item)
           current = true
 	  currentHasBeenFound = true
@@ -84,15 +99,13 @@ module Jot
       }
 
       if !currentHasBeenFound
-        formattedLists[0][:current] = true
-	WorkSpace.currentList = formattedLists[0][:name]
+        listsWithCurrent[0][:current] = true
+	WorkSpace.currentList = listsWithCurrent[0][:name]
       end
 
-      formattedLists.each {|list| 
-	prefix = list[:current] ? " * " : "   "
-        @output.puts prefix + list[:name] 
-      }
-    end    
+      return listsWithCurrent
+    end
+
   end
 
   class ListProviderFactory
