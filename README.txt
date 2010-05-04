@@ -4,7 +4,7 @@ jot
 
 == DESCRIPTION:
 
-a little list making command line tool
+a little list making command line tool that uses Checkvist to store its lists
 
 == FEATURES/PROBLEMS:
 

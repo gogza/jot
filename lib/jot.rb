@@ -67,27 +67,56 @@ module Jot
 
     def initialize(output_buffer)
       @output = output_buffer
-      @listProvider = ListProviderFactory.getProvider
     end
 
     def show_lists
-      lists = getListsWithCurrentSet @listProvider.lists
+      @output.puts
+      display_lists
+    end
 
-      lists.each {|list| 
+    def changeCurrentListTo listName
+      @output.puts
+      begin
+
+        list = ListRepository.findSingleList listName
+	ListRepository.makeCurrent list
+
+      rescue MoreThanOneMatchError
+        @output.puts "Hold on! Jot found more than one matching list.\n\n"
+      rescue NoMatchError
+        @output.puts "Sorry, jot can't find a matching list.\n\n"
+      end
+
+      display_lists
+
+    end
+
+    private	
+
+    def display_lists
+      @lists = ListRepository.getLists
+
+      @lists.each {|list| 
 	prefix = list[:current] ? " * " : "   "
         @output.puts prefix + list[:name] 
       }
     end
 
-    def changeCurrentListTo listName
-      WorkSpace.currentList = listName
-      show_lists
-    end
+  end
 
-    private
+  MoreThanOneMatchError = Class.new(StandardError)
+  NoMatchError = Class.new(StandardError)
 
-    def getListsWithCurrentSet lists
+  class ListRepository
+
+    @@listProvider = nil
+
+    def self.getLists
+      #setProvider
+
+      lists = ListProviderFactory.provider.lists
       currentHasBeenFound = false
+
       listsWithCurrent = lists.map {|item|
 	if WorkSpace.isCurrentList?(item)
           current = true
@@ -106,11 +135,40 @@ module Jot
       return listsWithCurrent
     end
 
+    def self.findSingleList criteria
+      #setProvider
+      criteria = Regexp.new(criteria) if criteria.kind_of? String
+
+      lists = ListProviderFactory.provider.lists
+
+      foundLists = lists.select {|list| list =~ criteria }
+      
+      raise NoMatchError, "No list matches the criteria" if foundLists.length == 0
+      raise MoreThanOneMatchError, "More than one list matches the criteria" if foundLists.length !=1
+
+      Hash[:name => foundLists[0]]
+
+    end
+
+    def self.makeCurrent list
+      WorkSpace.currentList = list[:name]
+    end
+
+    private
+
+    def self.setProvider
+      @@listProvider = ListProviderFactory.getProvider if @@listProvider == nil
+    end
+
   end
 
   class ListProviderFactory
-    def self.getProvider
-      CheckvistListProvider.new(CheckvistProxy.new)
+
+    @@provider = nil
+
+    def self.provider
+      @@provider = CheckvistListProvider.new(CheckvistProxy.new) if @@provider == nil
+      @@provider
     end
   end
 
@@ -142,19 +200,22 @@ module Jot
       end
     end
     
-
   end
 
   class WorkSpace
-   @@currentListName = ""
+   WORKSPACE_FILENAME = ".workspace"	  
    def self.clear
-     @@currentListName = ""
+     File.delete(WORKSPACE_FILENAME)
    end
    def self.currentList= listName
-     @@currentListName = listName	   
+     File.open(WORKSPACE_FILENAME, 'w') {|f| f.write(listName)}
    end
    def self.isCurrentList? listName
-     @@currentListName == listName
+
+     return nil if !File.exist?(WORKSPACE_FILENAME)
+
+     storedName = File.read(WORKSPACE_FILENAME)
+     storedName == listName
    end
   end
 

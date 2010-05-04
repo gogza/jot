@@ -27,14 +27,12 @@ end
 
 When /^I ask to see the lists$/ do
   @output = StringIO.new
-  jot = Jot::Jot.new(@output)
-  jot.show_lists
+  jot = Jot::Cli::Main.new(["lists"], @output)
 end
 
 When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
   @output = StringIO.new
-  jot = Jot::Jot.new(@output)
-  jot.changeCurrentListTo list_name
+  jot = Jot::Cli::Main.new(["lists", list_name], @output)
 end
 
 Then /^jot should display the following lists:$/ do |table|
@@ -81,4 +79,7 @@ Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
   listNames[0].should =~ Regexp.new(list_name)
 end
 
+Then /^jot should display a message saying "([^\"]*)"$/ do |message|
+  @output.string.should =~ Regexp.new(message)
+end
 
