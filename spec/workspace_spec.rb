@@ -5,15 +5,15 @@ module Jot
   describe WorkSpace do
     context "identify current list" do
       before(:each) do
-
+        @workspace = WorkSpace.new
       end
       it "identifies that the list is the current one" do
-        WorkSpace.currentList = "This one"
-	WorkSpace.isCurrentList?("This one").should == true
+        @workspace.currentList = "This one"
+	@workspace.isCurrentList?("This one").should == true
       end
       it "identifies that the list is not the current one" do
-        WorkSpace.currentList = "This one"
-	WorkSpace.isCurrentList?("Not this one").should == false
+        @workspace.currentList = "This one"
+	@workspace.isCurrentList?("Not this one").should == false
       end
 
 

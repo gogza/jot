@@ -7,69 +7,70 @@ module Jot
       before(:each) do
 	@provider = mock("List Provider").as_null_object
 	@provider.should_receive(:lists).and_return(["Garden tasks", "House tasks"])
-        ListProviderFactory.should_receive(:provider).and_return(@provider)
-        WorkSpace.should_receive(:isCurrentList?).with("Garden tasks").and_return(true)
-        WorkSpace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+	@workspace = mock("workspace").as_null_object
+        @workspace.should_receive(:provider).and_return(@provider)
+	@workspace.should_receive(:isCurrentList?).with("Garden tasks").and_return(true)
+        @workspace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+	@repository = ListRepository.new(@workspace)
       end
-#      it "should get a list provider from the List Provider Factory" do
-#        ListProviderFactory.should_receive(:provider)
-#        @lists = ListRepository.getLists
-#      end
 
-#      it "should get the lists from the provider" do
-#        @lists = ListRepository.getLists
-#	@provider.should_receive(:lists)
-#      end
+      it "should get the lists from the provider" do
+        @lists = @repository.getLists
+	@lists.length.should == 2
+      end
       
-#      it "should show the garden list" do
-#        @lists = ListRepository.getLists
-#	@lists.name.should == "stecet"
+      it "should show the garden list" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/Garden tasks/}.length.should == 1
+      end
 
-        # @lists.select{|list|[:name] =~/Garden tasks/}.length.should == 1
-#      end
-#      it "should show the house list" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:name] =~/House tasks/}.length.should == 1
-#      end
-#      it "should mark the garden list as current" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:name] =~/Garden tasks/}[:current].should_be_true
-#      end
-#      it "should not mark the house list as current" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:name] =~/Garden tasks/}[:current].should_be_false
-#      end
+      it "should show the house list" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/House tasks/}.length.should == 1
+      end
 
-#    end
+      it "should mark the garden list as current" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/Garden tasks/}.first[:current].should == true
+      end
 
-#    context "viewing list when current is not set" do
-#      before(:each) do
-#	@provider = mock("List Provider").as_null_object
-##	@provider.should_receive(:lists).and_return(["Garden tasks", "House tasks"])
-#        ListProviderFactory.should_receive(:getProvider).and_return(@provider)
-#	WorkSpace.should_receive(:isCurrentList?).with("Garden tasks").and_return(false)
-#        WorkSpace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+      it "should not mark the house list as current" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/House tasks/}.first[:current].should == false
+      end
 
-#	@output = mock("output buffer").as_null_object
+    end
 
-#	@jot = Jot.new(@output)
+    context "viewing list when current is not set" do
+      before(:each) do
+	@provider = mock("List Provider").as_null_object
+	@provider.should_receive(:lists).and_return(["Garden tasks", "House tasks"])
+	@workspace = mock("workspace").as_null_object
+        @workspace.should_receive(:provider).and_return(@provider)
+	@workspace.should_receive(:isCurrentList?).with("Garden tasks").and_return(false)
+        @workspace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+	@repository = ListRepository.new(@workspace)
 
-#      end
-#      it "should get the lists from the provider" do
-#        @lists = ListRepository.getLists
-#      end
-#      it "should show the garden list" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:name] =~/Garden tasks/}.length.should == 1
-#      end
-#      it "should show the house list" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:name] =~/House tasks/}.length.should == 1
-#      end
-#      it "should mark one of the lists as current" do
-#        @lists = ListRepository.getLists
-#        @lists.select{|list|[:current]}.length.should == 1
-#      end
+      end
+
+      it "should get the lists from the provider" do
+        @lists = @repository.getLists
+      end
+
+      it "should show the garden list" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/Garden tasks/}.length.should == 1
+      end
+
+      it "should show the house list" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:name] =~/House tasks/}.length.should == 1
+      end
+
+      it "should mark one of the lists as current" do
+        @lists = @repository.getLists
+        @lists.select{|list|list[:current]}.length.should == 1
+      end
 
     end
 

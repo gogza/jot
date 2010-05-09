@@ -65,8 +65,10 @@ module Jot
 
   class Jot
 
-    def initialize(output_buffer)
-      @output = output_buffer
+    def initialize(workspace)
+      @output = workspace.output_stream
+      @workspace = workspace
+      @repository = workspace.repository
     end
 
     def show_lists
@@ -78,8 +80,8 @@ module Jot
       @output.puts
       begin
 
-        list = ListRepository.findSingleList listName
-	ListRepository.makeCurrent list
+        list = @repository.findSingleList listName
+	@repository.makeCurrent list
 
       rescue MoreThanOneMatchError
         @output.puts "Hold on! Jot found more than one matching list.\n\n"
@@ -91,10 +93,10 @@ module Jot
 
     end
 
-    private	
+    private
 
     def display_lists
-      @lists = ListRepository.getLists
+      @lists = @repository.getLists
 
       @lists.each {|list| 
 	prefix = list[:current] ? " * " : "   "
@@ -108,17 +110,20 @@ module Jot
   NoMatchError = Class.new(StandardError)
 
   class ListRepository
+    
+    def initialize(workspace)
+      @workspace = workspace
+      @provider = workspace.provider
+    end
+    
+    def getLists
+    
+      lists = @provider.lists
 
-    @@listProvider = nil
-
-    def self.getLists
-      #setProvider
-
-      lists = ListProviderFactory.provider.lists
       currentHasBeenFound = false
 
       listsWithCurrent = lists.map {|item|
-	if WorkSpace.isCurrentList?(item)
+	if @workspace.isCurrentList?(item)
           current = true
 	  currentHasBeenFound = true
 	else
@@ -129,17 +134,17 @@ module Jot
 
       if !currentHasBeenFound
         listsWithCurrent[0][:current] = true
-	WorkSpace.currentList = listsWithCurrent[0][:name]
+	@workspace.currentList = listsWithCurrent[0][:name]
       end
 
       return listsWithCurrent
     end
 
-    def self.findSingleList criteria
-      #setProvider
+    def findSingleList criteria
+
       criteria = Regexp.new(criteria) if criteria.kind_of? String
 
-      lists = ListProviderFactory.provider.lists
+      lists = @provider.lists
 
       foundLists = lists.select {|list| list =~ criteria }
       
@@ -150,14 +155,8 @@ module Jot
 
     end
 
-    def self.makeCurrent list
-      WorkSpace.currentList = list[:name]
-    end
-
-    private
-
-    def self.setProvider
-      @@listProvider = ListProviderFactory.getProvider if @@listProvider == nil
+    def makeCurrent list
+      @workspace.currentList = list[:name]
     end
 
   end
@@ -166,13 +165,15 @@ module Jot
 
     @@provider = nil
 
-    def self.provider
+    def self.getProvider
       @@provider = CheckvistListProvider.new(CheckvistProxy.new) if @@provider == nil
       @@provider
     end
   end
 
   class CheckvistProxy
+
+    require "open-uri"
 
     def initialize
       @email = "mail.gordon.mcallister@gmail.com"
@@ -188,29 +189,50 @@ module Jot
       request.basic_auth @email, @api_key if @email
       request.set_form_data(parameters) if parameters
     
-      res = Net::HTTP.start(@url.host, @url.port) { |http|
-        http.request(request)
-      }
+      #res = Net::HTTP.start(@url.host, @url.port) { |http|
+      #  http.request(request)
+      #}
+
+      res = open(@url.to_s + request.path, :http_basic_authentication => [@email, @api_key])
     
-      case res
-      when Net::HTTPSuccess
-        JSON.parse(res.body)
-      else
-        res.error!
-      end
+      JSON.parse(res.string)
+
     end
     
   end
 
   class WorkSpace
-   WORKSPACE_FILENAME = ".workspace"	  
-   def self.clear
+    WORKSPACE_FILENAME = ".workspace"
+
+   def initialize(proxy_class = CheckvistProxy, output_stream = STDOUT)
+     @proxy_class = proxy_class
+     @output = output_stream
+     @proxy = @proxy_class.new
+     @provider = CheckvistListProvider.new @proxy
+     @repository = ListRepository.new self
+   end
+
+   def output_stream
+     @output	   
+   end
+
+   def repository
+     @repository
+   end
+
+   def provider
+     @provider
+   end
+
+   def clear
      File.delete(WORKSPACE_FILENAME)
    end
-   def self.currentList= listName
+
+   def currentList= listName
      File.open(WORKSPACE_FILENAME, 'w') {|f| f.write(listName)}
    end
-   def self.isCurrentList? listName
+
+   def isCurrentList? listName
 
      return nil if !File.exist?(WORKSPACE_FILENAME)
 

@@ -1,7 +1,9 @@
 Given /^I have to mock up a proxy for Checkvist$/ do
-  proxy = Jot::CheckvistProxyMock.new
 
-  Jot::ListProviderFactory.should_receive(:getProvider).and_return(Jot::CheckvistListProvider.new(proxy))
+  @output = StringIO.new
+  @workspace = Jot::WorkSpace.new(Jot::CheckvistProxyMock, @output)
+
+  Jot::Cli::Main.should_receive(:create_workspace).and_return(@workspace)
 
 end
 
@@ -18,20 +20,18 @@ Given /^I have an existing list called "([^\"]*)" list$/ do |list_name|
 end
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
-  Jot::WorkSpace.currentList = list_name
+  @workspace.currentList = list_name
 end
 
 Given /^none of the lists are marked as current$/ do
-  Jot::WorkSpace.clear
+  @workspace.clear
 end
 
 When /^I ask to see the lists$/ do
-  @output = StringIO.new
   jot = Jot::Cli::Main.new(["lists"], @output)
 end
 
 When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
-  @output = StringIO.new
   jot = Jot::Cli::Main.new(["lists", list_name], @output)
 end
 
@@ -65,7 +65,7 @@ end
 Then /^the jot workspace should have one list marked as current$/ do
   lines = @output.string.split("\n")
   listNames = lines.select {|line| 
-    Jot::WorkSpace.isCurrentList?(line.slice(3, line.length-3)) 
+    @workspace.isCurrentList?(line.slice(3, line.length-3)) 
   }
   listNames.length.should == 1
 end
@@ -74,7 +74,7 @@ Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 |list_name|
   lines = @output.string.split("\n")
   listNames = lines.select {|line| 
-    Jot::WorkSpace.isCurrentList?(line.slice(3, line.length-3)) 
+    @workspace.isCurrentList?(line.slice(3, line.length-3)) 
   }
   listNames[0].should =~ Regexp.new(list_name)
 end

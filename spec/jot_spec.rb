@@ -6,11 +6,15 @@ module Jot
     context "viewing list" do
       before(:each) do
 	list = [Hash[:current => true, :name => "Garden tasks"], Hash[:current => false, :name => "House tasks"]]
-        ListRepository.should_receive(:getLists).and_return(list)
 
+	@repository = mock("repository").as_null_object
+	@repository.should_receive(:getLists).and_return(list)
 	@output = mock("output buffer").as_null_object
+        @workspace = mock("workspace").as_null_object
+	@workspace.should_receive(:output_stream).and_return(@output)
+	@workspace.should_receive(:repository).and_return(@repository)
 
-	@jot = Jot.new(@output)
+	@jot = Jot.new(@workspace)
 
       end
       it "should show the garden list" do
