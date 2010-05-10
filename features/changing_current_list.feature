@@ -37,12 +37,11 @@ Feature: Changing the current list
      | name         |
      | Garden tasks |
      | House tasks  |
-    And jot should display a message saying "Sorry, jot can't find a matching list"
+    And jot should display a message saying "Sorry, Jot can't find a matching list"
     And jot should mark the "Garden tasks" as current 
     And jot should not mark the "House tasks" as current
     And the jot workspace should have the "Garden tasks" list marked as current
 
-  @wip
   Scenario: editor tries to change to list but the input matches more than one list
     When I ask to make "task" the current list
     Then jot should display the following lists:

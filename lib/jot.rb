@@ -65,6 +65,9 @@ module Jot
 
   class Jot
 
+    EMPTY_PREFIX = "   "
+    CURRENT_PREFIX = " * "
+
     def initialize(workspace)
       @output = workspace.output_stream
       @workspace = workspace
@@ -86,10 +89,14 @@ module Jot
       rescue MoreThanOneMatchError
         @output.puts "Hold on! Jot found more than one matching list.\n\n"
       rescue NoMatchError
-        @output.puts "Sorry, jot can't find a matching list.\n\n"
+        @output.puts "Sorry, Jot can't find a matching list.\n\n"
       end
 
       display_lists
+
+    end
+
+    def show_config
 
     end
 
@@ -99,7 +106,7 @@ module Jot
       @lists = @repository.getLists
 
       @lists.each {|list| 
-	prefix = list[:current] ? " * " : "   "
+	prefix = list[:current] ? CURRENT_PREFIX : EMPTY_PREFIX
         @output.puts prefix + list[:name] 
       }
     end
@@ -182,18 +189,12 @@ module Jot
     end
 
     def getCheckLists
-      json_call Net::HTTP::Get.new("/checklists.json")
+      json_call "/checklists.json"
     end
 
-    def json_call request, parameters = nil
-      request.basic_auth @email, @api_key if @email
-      request.set_form_data(parameters) if parameters
+    def json_call url, parameters = nil
     
-      #res = Net::HTTP.start(@url.host, @url.port) { |http|
-      #  http.request(request)
-      #}
-
-      res = open(@url.to_s + request.path, :http_basic_authentication => [@email, @api_key])
+      res = open(@url.to_s + url, :http_basic_authentication => [@email, @api_key])
     
       JSON.parse(res.string)
 

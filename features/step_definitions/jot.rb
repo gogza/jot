@@ -27,12 +27,27 @@ Given /^none of the lists are marked as current$/ do
   @workspace.clear
 end
 
+Given /^I have a configuration file containing:$/ do |table|
+  config_hash = table.hashes.first
+
+  config_file_name = "jot.config"
+
+  File.delete(config_file_name) if File.exist?(config_file_name)
+  
+  File.open(config_file_name,'w') {|f| f.write(config_hash.to_yaml)}
+
+end
+
 When /^I ask to see the lists$/ do
   jot = Jot::Cli::Main.new(["lists"], @output)
 end
 
 When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
   jot = Jot::Cli::Main.new(["lists", list_name], @output)
+end
+
+When /^I ask to see the configuration$/ do
+  jot = Jot::Cli::Main.new(["config"], @output)
 end
 
 Then /^jot should display the following lists:$/ do |table|
@@ -82,4 +97,9 @@ end
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|
   @output.string.should =~ Regexp.new(message)
 end
+
+Then /^jot should display the following:$/ do |table|
+  table.hashes.each{|hash| Then "jot should display a message saying \"#{hash[:displayed]}\""}
+end
+
 
