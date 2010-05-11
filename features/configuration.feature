@@ -9,11 +9,11 @@ Feature: Viewer wants to set up jot
   @wip
   Scenario: I want to see my current configuration
     Given I have a configuration file containing:
-     | email          | api     |
-     | joe@bloggs.com | 1234567 |
+     | email          | api        |
+     | joe@bloggs.com | ABC1234567 |
     When I ask to see the configuration
     Then jot should display the following:
      | displayed             |
      | email: joe@bloggs.com |
-     | api: 1234567          |
+     | api: ABC1234567       |
 

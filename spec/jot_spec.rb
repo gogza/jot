@@ -3,6 +3,26 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 
 module Jot
   describe Jot do
+    context "viewing configuration" do
+      before(:each) do
+	@output = mock("output stream").as_null_object
+	@workspace = mock("workspace").as_null_object
+	@workspace.should_receive(:output_stream).and_return(@output)
+	state = Hash["email" => "joe@bloggs.com", "api" => "1234"]
+	@workspace.should_receive(:configuration).and_return(state)
+        @jot = Jot.new(@workspace)
+      end
+
+      it "should display the email" do
+	@output.should_receive(:puts).with(/email: joe.bloggs.com/)
+	@jot.show_config
+      end 
+      it "should display the api" do
+	@output.should_receive(:puts).with(/api: 1234/)
+	@jot.show_config
+      end 
+    end
+
     context "viewing list" do
       before(:each) do
 	list = [Hash[:current => true, :name => "Garden tasks"], Hash[:current => false, :name => "House tasks"]]

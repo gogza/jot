@@ -97,7 +97,10 @@ module Jot
     end
 
     def show_config
-
+      configuration = @workspace.configuration
+      @output.puts
+      @output.puts "email: #{configuration["email"]}"
+      @output.puts "api: #{configuration["api"]}"
     end
 
     private
@@ -204,42 +207,49 @@ module Jot
 
   class WorkSpace
     WORKSPACE_FILENAME = ".workspace"
+    CONFIG_FILENAME = "jot.config"
 
-   def initialize(proxy_class = CheckvistProxy, output_stream = STDOUT)
-     @proxy_class = proxy_class
-     @output = output_stream
-     @proxy = @proxy_class.new
-     @provider = CheckvistListProvider.new @proxy
-     @repository = ListRepository.new self
-   end
+    def initialize(proxy_class = CheckvistProxy, output_stream = STDOUT)
+      @proxy_class = proxy_class
+      @output = output_stream
+      @proxy = @proxy_class.new
+      @provider = CheckvistListProvider.new @proxy
+      @repository = ListRepository.new self
+      @config = YAML.load(File.read(CONFIG_FILENAME))
+    end
 
-   def output_stream
-     @output	   
-   end
+    def output_stream
+      @output	   
+    end
+ 
+    def repository
+      @repository
+    end
 
-   def repository
-     @repository
-   end
+    def provider
+      @provider
+    end
 
-   def provider
-     @provider
-   end
+    def clear
+      File.delete(WORKSPACE_FILENAME)
+    end
 
-   def clear
-     File.delete(WORKSPACE_FILENAME)
-   end
+    def currentList= listName
+      File.open(WORKSPACE_FILENAME, 'w') {|f| f.write(listName)}
+    end
 
-   def currentList= listName
-     File.open(WORKSPACE_FILENAME, 'w') {|f| f.write(listName)}
-   end
+    def isCurrentList? listName
 
-   def isCurrentList? listName
+      return nil if !File.exist?(WORKSPACE_FILENAME)
 
-     return nil if !File.exist?(WORKSPACE_FILENAME)
+      storedName = File.read(WORKSPACE_FILENAME)
+      storedName == listName
+    end
+   
+    def configuration
+      @config
+    end
 
-     storedName = File.read(WORKSPACE_FILENAME)
-     storedName == listName
-   end
   end
 
   class CheckvistProxyMock

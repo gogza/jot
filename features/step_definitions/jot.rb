@@ -32,7 +32,7 @@ Given /^I have a configuration file containing:$/ do |table|
 
   config_file_name = "jot.config"
 
-  File.delete(config_file_name) if File.exist?(config_file_name)
+  File.delete(config_file_name)
   
   File.open(config_file_name,'w') {|f| f.write(config_hash.to_yaml)}
 
