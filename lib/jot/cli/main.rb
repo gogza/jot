@@ -4,7 +4,7 @@ module Jot
       
       require 'trollop'
 
-      COMMANDS = %w{lists}
+      COMMANDS = %w{lists config}
 
       def self.execute(args)
         new(args)
@@ -19,36 +19,65 @@ module Jot
           stop_on COMMANDS
         end
 
-	cmd = args.shift
+	@command_hash = build_command_hash(args)
 
-	opts = case cmd
-	  when "lists"    
-	    Hash[:command => cmd, :opts => Hash[:list_name => args * " "]]
-	  when "config"
-	    Hash[:command => cmd]
-	  else
-	    Trollop::die "unknown subcommand #{cmd.inspect}"
-          end
-	
 	workspace = self.class.create_workspace
 
-	jot = Jot.new(workspace)
+	jot = self.class.create_jot workspace
 
-	if opts[:command] == "lists"
-          if opts[:opts][:list_name] == ""
+	cmd = @command_hash[:command]
+	opts = @command_hash[:opts]
+
+	if cmd == "lists"
+          if opts[:list_name] == ""
   	    jot.show_lists
 	  else
-            puts "!!!!! \"#{opts[:opts][:list_name]}\""
-	    jot.changeCurrentListTo opts[:opts][:list_name]
+	    jot.changeCurrentListTo opts[:list_name]
           end
-	else
-	 jot.show_config
+	elsif cmd == "config"
+          if opts[:email] == nil
+  	    jot.show_config
+	  else
+	    jot.change_config opts
+          end
         end
 
       end
 
+      def command_hash
+        @command_hash
+      end
+
       def self.create_workspace
 	WorkSpace.new
+      end
+
+      def self.create_jot(workspace)
+        Jot.new workspace
+      end
+
+      private
+      
+      def build_command_hash(args)
+	cmd = args.shift
+
+        command_hash = Hash[:command => cmd]
+
+	opts = case cmd
+	  when "lists"    
+	    Hash[:list_name => args * " "]
+	  when "config"
+	    Trollop::options args do
+              opt :email, "Configuration email address", :type => :string
+	      opt :api, "Configuration api", :type => :string
+	    end
+	  else
+	    Trollop::die "unknown subcommand #{cmd.inspect}"
+          end
+	
+	command_hash.merge!(Hash[:opts => opts]) if opts != nil
+
+	return command_hash
       end
 
     end

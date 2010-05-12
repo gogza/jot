@@ -3,13 +3,33 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 
 module Jot
   describe Jot do
+    context "changing the configuration" do
+      before(:each) do
+	@output = mock("output stream").as_null_object
+	@workspace = mock("workspace").as_null_object
+	@workspace.should_receive(:output_stream).and_return(@output)
+        @jot = Jot.new(@workspace)
+	@new_config = Hash[:email => "ben@bloggs.com",:api => "4321"]
+      end
+
+      it "should write to the new email address to configuration" do
+	@workspace.should_receive(:configuration=).with(hash_including({"email" => "ben@bloggs.com"}))
+	@jot.change_config(@new_config)
+      end
+
+      it "should write to the new api to configuration" do
+	@workspace.should_receive(:configuration=).with(hash_including({"api" => "4321"}))
+	@jot.change_config(@new_config)
+      end
+    end
+
     context "viewing configuration" do
       before(:each) do
 	@output = mock("output stream").as_null_object
 	@workspace = mock("workspace").as_null_object
 	@workspace.should_receive(:output_stream).and_return(@output)
-	state = Hash["email" => "joe@bloggs.com", "api" => "1234"]
-	@workspace.should_receive(:configuration).and_return(state)
+	config = Hash["email" => "joe@bloggs.com", "api" => "1234"]
+	@workspace.should_receive(:configuration).and_return(config)
         @jot = Jot.new(@workspace)
       end
 

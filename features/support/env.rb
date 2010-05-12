@@ -3,4 +3,5 @@ require 'spec'
 require 'spec/expectations'
 require 'spec/mocks'
 require 'jot'
+require 'ftools'
 

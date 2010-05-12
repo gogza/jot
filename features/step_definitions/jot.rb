@@ -1,5 +1,10 @@
 Given /^I have to mock up a proxy for Checkvist$/ do
 
+  Given "I have a configuration file containing:", table(%{
+     | email          | api        |
+     | joe@bloggs.com | ABC1234567 |
+  })
+
   @output = StringIO.new
   @workspace = Jot::WorkSpace.new(Jot::CheckvistProxyMock, @output)
 
@@ -32,7 +37,7 @@ Given /^I have a configuration file containing:$/ do |table|
 
   config_file_name = "jot.config"
 
-  File.delete(config_file_name)
+  File.delete(config_file_name) if File.exist?(config_file_name)
   
   File.open(config_file_name,'w') {|f| f.write(config_hash.to_yaml)}
 
@@ -48,6 +53,11 @@ end
 
 When /^I ask to see the configuration$/ do
   jot = Jot::Cli::Main.new(["config"], @output)
+end
+
+When /^I ask to change the configuration to:$/ do |table|
+  config = table.hashes.first
+  jot = Jot::Cli::Main.new(["config", "-e", config["email"], "-a", config["api"]], @output)  
 end
 
 Then /^jot should display the following lists:$/ do |table|
@@ -95,11 +105,17 @@ Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 end
 
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|
+  puts "!!! " + @output.string
   @output.string.should =~ Regexp.new(message)
 end
 
 Then /^jot should display the following:$/ do |table|
   table.hashes.each{|hash| Then "jot should display a message saying \"#{hash[:displayed]}\""}
 end
+
+Then /^the configuration file should contain the following:$/ do |table|
+  table.hashes.each{|hash| File.read("jot.config").should =~ Regexp.new(hash["value"])}	
+end
+
 
 

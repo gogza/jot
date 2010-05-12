@@ -98,9 +98,15 @@ module Jot
 
     def show_config
       configuration = @workspace.configuration
+      puts "!!! #{configuration.inspect}"
       @output.puts
       @output.puts "email: #{configuration["email"]}"
       @output.puts "api: #{configuration["api"]}"
+    end
+
+    def change_config config
+      new_config = Hash["email" => config[:email], "api" => config[:api]]
+      @workspace.configuration = new_config
     end
 
     private
@@ -206,6 +212,7 @@ module Jot
   end
 
   class WorkSpace
+
     WORKSPACE_FILENAME = ".workspace"
     CONFIG_FILENAME = "jot.config"
 
@@ -215,7 +222,7 @@ module Jot
       @proxy = @proxy_class.new
       @provider = CheckvistListProvider.new @proxy
       @repository = ListRepository.new self
-      @config = YAML.load(File.read(CONFIG_FILENAME))
+      load_config
     end
 
     def output_stream
@@ -249,6 +256,22 @@ module Jot
     def configuration
       @config
     end
+    def configuration= new_config
+      @config["email"] = new_config["email"]
+      @config["api"] = new_config["api"]
+      save_config
+    end
+
+    private
+
+    def load_config
+      @config = YAML.load(File.read(CONFIG_FILENAME))
+    end
+
+    def save_config
+      File.open(CONFIG_FILENAME, 'w') {|f| f.write(@config.to_yaml)}
+    end
+
 
   end
 
