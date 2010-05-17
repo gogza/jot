@@ -98,8 +98,8 @@ module Jot
 
     def show_config
       configuration = @workspace.configuration
-      puts "!!! #{configuration.inspect}"
       @output.puts
+      puts @output.inspect
       @output.puts "email: #{configuration["email"]}"
       @output.puts "api: #{configuration["api"]}"
     end
@@ -216,7 +216,7 @@ module Jot
     WORKSPACE_FILENAME = ".workspace"
     CONFIG_FILENAME = "jot.config"
 
-    def initialize(proxy_class = CheckvistProxy, output_stream = STDOUT)
+    def initialize (output_stream, proxy_class)
       @proxy_class = proxy_class
       @output = output_stream
       @proxy = @proxy_class.new

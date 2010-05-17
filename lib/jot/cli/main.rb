@@ -10,7 +10,7 @@ module Jot
         new(args)
       end
 
-      def initialize(args, out_stream = STDOUT)
+      def initialize(args, out_stream = STDOUT, proxy_class = CheckvistProxy)
         version = File.read("version.txt")
 
 	global_opts = Trollop::options(args) do
@@ -21,7 +21,7 @@ module Jot
 
 	@command_hash = build_command_hash(args)
 
-	workspace = self.class.create_workspace
+	workspace = build_workspace out_stream, proxy_class
 
 	jot = self.class.create_jot workspace
 
@@ -48,8 +48,12 @@ module Jot
         @command_hash
       end
 
-      def self.create_workspace
-	WorkSpace.new
+      def build_workspace
+	WorkSpace.new @out_stream, @proxy_class
+      end
+
+      def self.create_workspace out_stream
+	WorkSpace.new out_stream
       end
 
       def self.create_jot(workspace)

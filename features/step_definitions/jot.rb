@@ -6,7 +6,8 @@ Given /^I have to mock up a proxy for Checkvist$/ do
   })
 
   @output = StringIO.new
-  @workspace = Jot::WorkSpace.new(Jot::CheckvistProxyMock, @output)
+  puts "! #{@output.inspect}"
+  @workspace = Jot::WorkSpace.new(@output, Jot::CheckvistProxyMock)
 
   Jot::Cli::Main.should_receive(:create_workspace).and_return(@workspace)
 
@@ -52,6 +53,7 @@ When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
 end
 
 When /^I ask to see the configuration$/ do
+  puts "!! #{@output.inspect}"	
   jot = Jot::Cli::Main.new(["config"], @output)
 end
 
@@ -105,11 +107,12 @@ Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 end
 
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|
-  puts "!!! " + @output.string
+  puts "!!! " + @output.inspect
   @output.string.should =~ Regexp.new(message)
 end
 
 Then /^jot should display the following:$/ do |table|
+  puts "!!!! #{@output.inspect}"
   table.hashes.each{|hash| Then "jot should display a message saying \"#{hash[:displayed]}\""}
 end
 
