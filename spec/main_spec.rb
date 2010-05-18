@@ -7,9 +7,9 @@ module Jot::Cli
     def execute_cli (cli_input)
       input = cli_input.split(" ")
       input.shift if input[0] == "jot"
-      Main.new(input)
+      @output = mock("output").as_null_object
+      Main.new(input,@output, Jot::CheckvistProxyMock)
     end	   
-
 
     context "processing configuration command" do
       before(:each) do

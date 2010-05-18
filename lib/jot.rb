@@ -99,7 +99,6 @@ module Jot
     def show_config
       configuration = @workspace.configuration
       @output.puts
-      puts @output.inspect
       @output.puts "email: #{configuration["email"]}"
       @output.puts "api: #{configuration["api"]}"
     end
@@ -135,7 +134,6 @@ module Jot
     def getLists
     
       lists = @provider.lists
-
       currentHasBeenFound = false
 
       listsWithCurrent = lists.map {|item|
@@ -213,8 +211,8 @@ module Jot
 
   class WorkSpace
 
-    WORKSPACE_FILENAME = ".workspace"
-    CONFIG_FILENAME = "jot.config"
+    #WORKSPACE_FILENAME = ".workspace"
+    #CONFIG_FILENAME = "jot.config"
 
     def initialize (output_stream, proxy_class)
       @proxy_class = proxy_class
@@ -279,16 +277,16 @@ module Jot
 
     @@lists = []
 
-    def initialize
-      @@lists = []
-    end
-
     def getCheckLists
       @@lists.map {|list| Hash["name" => list] }
     end
 
     def self.add_list(list_name)
       @@lists << list_name
+    end
+
+    def self.clear
+      @@lists = []
     end
 
   end

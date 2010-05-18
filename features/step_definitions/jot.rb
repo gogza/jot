@@ -6,15 +6,11 @@ Given /^I have to mock up a proxy for Checkvist$/ do
   })
 
   @output = StringIO.new
-  puts "! #{@output.inspect}"
-  @workspace = Jot::WorkSpace.new(@output, Jot::CheckvistProxyMock)
-
-  Jot::Cli::Main.should_receive(:create_workspace).and_return(@workspace)
 
 end
 
 Given /^I have an existing list with:$/ do |table|
-
+  Jot::CheckvistProxyMock.clear
   table.hashes.each {|hash| Jot::CheckvistProxyMock.add_list hash[:name] }
 
 end
@@ -26,11 +22,11 @@ Given /^I have an existing list called "([^\"]*)" list$/ do |list_name|
 end
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
-  @workspace.currentList = list_name
+  File.open(WORKSPACE_FILENAME,'w') {|f| f.write list_name}
 end
 
 Given /^none of the lists are marked as current$/ do
-  @workspace.clear
+  File.open(WORKSPACE_FILENAME,'w') {|f| f.write ""}
 end
 
 Given /^I have a configuration file containing:$/ do |table|
@@ -45,21 +41,20 @@ Given /^I have a configuration file containing:$/ do |table|
 end
 
 When /^I ask to see the lists$/ do
-  jot = Jot::Cli::Main.new(["lists"], @output)
+  jot = Jot::Cli::Main.new(["lists"], @output, Jot::CheckvistProxyMock)
 end
 
 When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
-  jot = Jot::Cli::Main.new(["lists", list_name], @output)
+  jot = Jot::Cli::Main.new(["lists", list_name], @output, Jot::CheckvistProxyMock)
 end
 
 When /^I ask to see the configuration$/ do
-  puts "!! #{@output.inspect}"	
-  jot = Jot::Cli::Main.new(["config"], @output)
+  jot = Jot::Cli::Main.new(["config"], @output, Jot::CheckvistProxyMock)
 end
 
 When /^I ask to change the configuration to:$/ do |table|
   config = table.hashes.first
-  jot = Jot::Cli::Main.new(["config", "-e", config["email"], "-a", config["api"]], @output)  
+  jot = Jot::Cli::Main.new(["config", "-e", config["email"], "-a", config["api"]], @output, Jot::CheckvistProxyMock)  
 end
 
 Then /^jot should display the following lists:$/ do |table|
@@ -90,29 +85,19 @@ Then /^jot should mark the one of the lists as current$/ do
 end
 
 Then /^the jot workspace should have one list marked as current$/ do
-  lines = @output.string.split("\n")
-  listNames = lines.select {|line| 
-    @workspace.isCurrentList?(line.slice(3, line.length-3)) 
-  }
-  listNames.length.should == 1
+  File.read(WORKSPACE_FILENAME).length.should_not == 0
 end
 
 Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 |list_name|
-  lines = @output.string.split("\n")
-  listNames = lines.select {|line| 
-    @workspace.isCurrentList?(line.slice(3, line.length-3)) 
-  }
-  listNames[0].should =~ Regexp.new(list_name)
+  File.read(WORKSPACE_FILENAME).should =~ Regexp.new(list_name)
 end
 
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|
-  puts "!!! " + @output.inspect
   @output.string.should =~ Regexp.new(message)
 end
 
 Then /^jot should display the following:$/ do |table|
-  puts "!!!! #{@output.inspect}"
   table.hashes.each{|hash| Then "jot should display a message saying \"#{hash[:displayed]}\""}
 end
 

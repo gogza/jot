@@ -21,7 +21,9 @@ Feature: Viewer wants to see their lists
     And jot should not mark the "House tasks" as current  
 
   Scenario: viewing a single list
-    Given I have an existing list called "Garden tasks" list
+    Given I have an existing list with:
+     | name         |
+     | Garden tasks |
     When I ask to see the lists
     Then jot should show the "Garden tasks" list
     And jot should mark the "Garden tasks" as current

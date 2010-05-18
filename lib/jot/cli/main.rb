@@ -48,8 +48,8 @@ module Jot
         @command_hash
       end
 
-      def build_workspace
-	WorkSpace.new @out_stream, @proxy_class
+      def build_workspace out_stream, proxy_class
+	WorkSpace.new out_stream, proxy_class
       end
 
       def self.create_workspace out_stream

@@ -6,7 +6,8 @@ module Jot
 
     context "updating the config file" do
       before(:each) do
-	@workspace = WorkSpace.new
+	@output = mock("output").as_null_object
+	@workspace = WorkSpace.new(@output, CheckvistProxyMock)
 	new_config = Hash["email" => "ben@bloggs.com", "api" => "4321"]
 	@workspace.configuration = new_config
         @file_contents = File.read("jot.config")
@@ -24,7 +25,8 @@ module Jot
 	File.delete("jot.config")
         File.open("jot.config", 'w') {|f| f.write(Hash["email" => "joe@bloggs.com", "api" => "ABC1234"].to_yaml)}
 
-        @workspace = WorkSpace.new
+	@output = mock("output").as_null_object
+	@workspace = WorkSpace.new(@output, CheckvistProxyMock)
 
       end
       it "can read the email address" do
@@ -41,7 +43,8 @@ module Jot
 
     context "identify current list" do
       before(:each) do
-        @workspace = WorkSpace.new
+	@output = mock("output").as_null_object
+	@workspace = WorkSpace.new(@output, CheckvistProxyMock)
       end
       it "identifies that the list is the current one" do
         @workspace.currentList = "This one"

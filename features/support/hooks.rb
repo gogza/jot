@@ -1,5 +1,6 @@
-CONFIG_FILENAME = "jot.config"
-BACKUP_FILENAME = "." + CONFIG_FILENAME
+#CONFIG_FILENAME = "jot.config"
+#BACKUP_FILENAME = "." + CONFIG_FILENAME
+#
 
 Before('@config') do
   puts "Hiding the current config file"
