@@ -9,23 +9,25 @@ Feature: Viewer wants to set up jot
   @wip @config
   Scenario: I want to see my configuration file
     Given I have a configuration file containing:
-     | email          | api        |
-     | joe@bloggs.com | ABC1234567 |
+     | email          | api        | proxy              |
+     | joe@bloggs.com | ABC1234567 | CheckvistProxyMock |
     Then the configuration file should contain the following:
-     | value          |
-     | joe@bloggs.com |
-     | ABC1234567     |  
+     | value              |
+     | joe@bloggs.com     |
+     | ABC1234567         |
+     | CheckvistProxyMock |  
 
   @wip @config
   Scenario: I want to see my current configuration
     Given I have a configuration file containing:
-     | email          | api        |
-     | joe@bloggs.com | ABC1234567 |
+     | email          | api        | proxy              |
+     | joe@bloggs.com | ABC1234567 | CheckvistProxyMock |
     When I ask to see the configuration
     Then jot should display the following:
-     | displayed             |
-     | email: joe@bloggs.com |
-     | api: ABC1234567       |
+     | displayed                 |
+     | email: joe@bloggs.com     |
+     | api: ABC1234567           |
+     | proxy: CheckvistProxyMock |
 
   @wip @config
   Scenario: I want to change my current configuration
@@ -39,5 +41,4 @@ Feature: Viewer wants to set up jot
      | value          |
      | ben@bloggs.com |
      | XYZ1234567     |  
-
 

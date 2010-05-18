@@ -97,10 +97,9 @@ module Jot
     end
 
     def show_config
-      configuration = @workspace.configuration
+      config = @workspace.configuration
       @output.puts
-      @output.puts "email: #{configuration["email"]}"
-      @output.puts "api: #{configuration["api"]}"
+      config.each_pair {|k,v| @output.puts "#{k}: #{v}"}
     end
 
     def change_config config
@@ -211,16 +210,17 @@ module Jot
 
   class WorkSpace
 
-    #WORKSPACE_FILENAME = ".workspace"
-    #CONFIG_FILENAME = "jot.config"
+    def initialize (output_stream)
 
-    def initialize (output_stream, proxy_class)
-      @proxy_class = proxy_class
       @output = output_stream
+
+      load_config
+
+      @proxy_class = @config["proxy"] == nil ? CheckvistProxy : Kernel.const_get("Jot").const_get(@config["proxy"])
+
       @proxy = @proxy_class.new
       @provider = CheckvistListProvider.new @proxy
       @repository = ListRepository.new self
-      load_config
     end
 
     def output_stream

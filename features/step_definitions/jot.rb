@@ -1,8 +1,8 @@
 Given /^I have to mock up a proxy for Checkvist$/ do
 
   Given "I have a configuration file containing:", table(%{
-     | email          | api        |
-     | joe@bloggs.com | ABC1234567 |
+     | email          | api        | proxy              |
+     | joe@bloggs.com | ABC1234567 | CheckvistProxyMock |
   })
 
   @output = StringIO.new
@@ -41,20 +41,20 @@ Given /^I have a configuration file containing:$/ do |table|
 end
 
 When /^I ask to see the lists$/ do
-  jot = Jot::Cli::Main.new(["lists"], @output, Jot::CheckvistProxyMock)
+  jot = Jot::Cli::Main.new(["lists"], @output)
 end
 
 When /^I ask to make "([^\"]*)" the current list$/ do |list_name|
-  jot = Jot::Cli::Main.new(["lists", list_name], @output, Jot::CheckvistProxyMock)
+  jot = Jot::Cli::Main.new(["lists", list_name], @output)
 end
 
 When /^I ask to see the configuration$/ do
-  jot = Jot::Cli::Main.new(["config"], @output, Jot::CheckvistProxyMock)
+  jot = Jot::Cli::Main.new(["config"], @output)
 end
 
 When /^I ask to change the configuration to:$/ do |table|
   config = table.hashes.first
-  jot = Jot::Cli::Main.new(["config", "-e", config["email"], "-a", config["api"]], @output, Jot::CheckvistProxyMock)  
+  jot = Jot::Cli::Main.new(["config", "-e", config["email"], "-a", config["api"]], @output)  
 end
 
 Then /^jot should display the following lists:$/ do |table|
