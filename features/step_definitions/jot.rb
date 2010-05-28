@@ -7,14 +7,14 @@ end
 
 Given /^I have an existing list with:$/ do |table|
 
-  @user = "mail.gordon.mcallister%40gmail.com"
-  @password = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
+  #@user = "mail.gordon.mcallister%40gmail.com"
+  #@password = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
 
   json_array = table.hashes.map {|hash| build_json hash[:name]}
   
   json = "[#{json_array * ","}]"
-
-  FakeWeb.register_uri (:get, "http://#@user:#@password@checkvist.com/checklists.json", :body => json)
+ 
+  FakeWeb.register_uri (:get, "http://#{escape(@user)}:#{escape(@password)}@checkvist.com/checklists.json", :body => json)
 
 end
 
@@ -22,6 +22,9 @@ def build_json name
   "{\"name\":\"#{name}\",\"updated_at\":\"2010/04/19 18:45:22 +0000\",\"public\":true,\"id\":32457,\"task_completed\":0,\"task_count\":2}"
 end
 
+def escape parameter
+  URI.escape(parameter, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")) 
+end
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
   File.open(WORKSPACE_FILENAME,'w') {|f| f.write list_name}
@@ -33,6 +36,9 @@ end
 
 Given /^I have a configuration file containing:$/ do |table|
   config_hash = table.hashes.first
+
+  @user = config_hash["email"]
+  @password = config_hash["api"]
 
   config_file_name = "jot.config"
 

@@ -4,9 +4,9 @@ module Jot
 
     require "open-uri"
 
-    def initialize
-      @email = "mail.gordon.mcallister@gmail.com"
-      @api_key = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
+    def initialize email, api_key
+      @email = email
+      @api_key = api_key
       @host = URI.parse("http://checkvist.com")
     end
 
@@ -22,35 +22,6 @@ module Jot
 
     end
     
-  end
-
-  class CheckvistProxyMock
-
-    @@lists = []
-    @@visited_url = []
-
-    def initialize host
-      @host = host
-    end
-
-    def getCheckLists
-      @@visited_url << @host + "/checklists.json"
-      @@lists.map {|list| Hash["name" => list] }
-    end
-
-    def self.add_list(list_name)
-      @@lists << list_name
-    end
-
-    def self.clear
-      @@lists = []
-      @@visited_url = []
-    end
-
-    def self.has_visited url
-      @@visited_url.include? url
-    end
-
   end
 
 end  # module Jot

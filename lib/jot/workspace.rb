@@ -10,7 +10,7 @@ module Jot
 
       @proxy_class = @config["proxy"] == nil ? CheckvistProxy : Kernel.const_get("Jot").const_get(@config["proxy"])
 
-      @proxy = @proxy_class.new
+      @proxy = @proxy_class.new @config["email"], @config["api"]
       @provider = CheckvistListProvider.new @proxy
       @repository = ListRepository.new self
     end
