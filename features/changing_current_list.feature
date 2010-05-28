@@ -4,7 +4,10 @@ Feature: Changing the current list
   So that I can work on the one I want
 
   Background:
-    Given I have to mock up a proxy for Checkvist
+    Given I want to output to a string
+    And I have a configuration file containing:
+     | email          | api        | proxy          |
+     | joe@bloggs.com | ABC1234567 | CheckvistProxy |
     And I have an existing list with:
      | name         |
      | Garden tasks |

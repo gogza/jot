@@ -4,7 +4,10 @@ Feature: Viewer wants to see their lists
   So that I can choose one to work on
 
   Background:
-    Given I have to mock up a proxy for Checkvist
+    Given I want to output to a string
+    And I have a configuration file containing:
+     | email     | api        | proxy          |
+     | joebloggs | ABC1234567 | CheckvistProxy |
 
   Scenario: viewing multiple lists
     Given I have an existing list with:

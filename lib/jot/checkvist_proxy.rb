@@ -7,7 +7,7 @@ module Jot
     def initialize
       @email = "mail.gordon.mcallister@gmail.com"
       @api_key = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
-      @url = URI.parse("http://checkvist.com")
+      @host = URI.parse("http://checkvist.com")
     end
 
     def getCheckLists
@@ -16,7 +16,7 @@ module Jot
 
     def json_call url, parameters = nil
     
-      res = open(@url.to_s + url, :http_basic_authentication => [@email, @api_key])
+      res = open(@host.to_s + url, :http_basic_authentication => [@email, @api_key])
     
       JSON.parse(res.string)
 
@@ -27,8 +27,14 @@ module Jot
   class CheckvistProxyMock
 
     @@lists = []
+    @@visited_url = []
+
+    def initialize host
+      @host = host
+    end
 
     def getCheckLists
+      @@visited_url << @host + "/checklists.json"
       @@lists.map {|list| Hash["name" => list] }
     end
 
@@ -38,6 +44,11 @@ module Jot
 
     def self.clear
       @@lists = []
+      @@visited_url = []
+    end
+
+    def self.has_visited url
+      @@visited_url.include? url
     end
 
   end

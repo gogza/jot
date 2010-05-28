@@ -1,25 +1,27 @@
-Given /^I have to mock up a proxy for Checkvist$/ do
-
-  Given "I have a configuration file containing:", table(%{
-     | email          | api        | proxy              |
-     | joe@bloggs.com | ABC1234567 | CheckvistProxyMock |
-  })
+Given /^I want to output to a string$/ do
 
   @output = StringIO.new
-
+  FakeWeb.allow_net_connect = false
+  FakeWeb.clean_registry
 end
 
 Given /^I have an existing list with:$/ do |table|
-  Jot::CheckvistProxyMock.clear
-  table.hashes.each {|hash| Jot::CheckvistProxyMock.add_list hash[:name] }
+
+  @user = "mail.gordon.mcallister%40gmail.com"
+  @password = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
+
+  json_array = table.hashes.map {|hash| build_json hash[:name]}
+  
+  json = "[#{json_array * ","}]"
+
+  FakeWeb.register_uri (:get, "http://#@user:#@password@checkvist.com/checklists.json", :body => json)
 
 end
 
-Given /^I have an existing list called "([^\"]*)" list$/ do |list_name|
-
-  Jot::CheckvistProxyMock.add_list(list_name)
-
+def build_json name
+  "{\"name\":\"#{name}\",\"updated_at\":\"2010/04/19 18:45:22 +0000\",\"public\":true,\"id\":32457,\"task_completed\":0,\"task_count\":2}"
 end
+
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
   File.open(WORKSPACE_FILENAME,'w') {|f| f.write list_name}
@@ -105,5 +107,8 @@ Then /^the configuration file should contain the following:$/ do |table|
   table.hashes.each{|hash| File.read("jot.config").should =~ Regexp.new(hash["value"])}	
 end
 
+Then /^jot should visit the "([^\"]*)" url$/ do |url|
+  Jot::CheckvistProxyMock.has_visited(url).should == true
+end
 
 
