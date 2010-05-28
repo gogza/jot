@@ -2,6 +2,6 @@
 *.log
 
 # Will exclude any vim temporary files
-*.*~
+*~
 *.swp
 
