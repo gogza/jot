@@ -27,11 +27,11 @@ def escape parameter
 end
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
-  File.open(WORKSPACE_FILENAME,'w') {|f| f.write list_name}
+  File.open(STATE_FILENAME,'w') {|f| f.write Hash["currentList" => list_name].to_yaml}
 end
 
 Given /^none of the lists are marked as current$/ do
-  File.open(WORKSPACE_FILENAME,'w') {|f| f.write ""}
+  File.open(STATE_FILENAME,'w') {|f| f.write Hash["currentList" => nil].to_yaml}
 end
 
 Given /^I have a configuration file containing:$/ do |table|
@@ -93,12 +93,12 @@ Then /^jot should mark the one of the lists as current$/ do
 end
 
 Then /^the jot workspace should have one list marked as current$/ do
-  File.read(WORKSPACE_FILENAME).length.should_not == 0
+  File.read(STATE_FILENAME).length.should_not == 0
 end
 
 Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 |list_name|
-  File.read(WORKSPACE_FILENAME).should =~ Regexp.new(list_name)
+  File.read(STATE_FILENAME).should =~ Regexp.new(list_name)
 end
 
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|

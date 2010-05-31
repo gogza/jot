@@ -1,6 +1,10 @@
 # Will exclude all .log files
 *.log
 
+# will exclude any jot config file or workspace file
+jot.config*
+.state
+
 # Will exclude any vim temporary files
 *~
 *.swp

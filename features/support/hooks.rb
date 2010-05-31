@@ -1,18 +1,21 @@
-#CONFIG_FILENAME = "jot.config"
-#BACKUP_FILENAME = "." + CONFIG_FILENAME
-#
 
-Before('@config') do
-  puts "Hiding the current config file"
-  File.delete(BACKUP_FILENAME) if File.exist?(BACKUP_FILENAME)
-  File.copy(CONFIG_FILENAME, BACKUP_FILENAME)
-  File.delete(CONFIG_FILENAME)
+def hide_file filename, backup_filename
+  File.delete(backup_filename) if File.exist?(backup_filename)
+  File.copy(filename, backup_filename)
+  File.delete(filename)
 end
 
-After('@config') do
-  puts "Restoring the current config file"
-  File.delete(CONFIG_FILENAME) if File.exist?(CONFIG_FILENAME) 
-  File.copy(BACKUP_FILENAME, CONFIG_FILENAME)
-  File.delete(BACKUP_FILENAME)  
+Before do
+  puts "Hiding the current config and state files"
+
+  hide_file CONFIG_FILENAME, CONFIG_BACKUP_FILENAME
+  hide_file STATE_FILENAME, STATE_BACKUP_FILENAME
+end
+
+After do
+  puts "Restoring the current config and state files"
+
+  hide_file CONFIG_BACKUP_FILENAME, CONFIG_FILENAME
+  hide_file STATE_BACKUP_FILENAME, STATE_FILENAME
 end
 

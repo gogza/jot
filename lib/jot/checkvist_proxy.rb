@@ -4,10 +4,11 @@ module Jot
 
     require "open-uri"
 
+    HOST = "http://checkvist.com"
+
     def initialize email, api_key
       @email = email
       @api_key = api_key
-      @host = URI.parse("http://checkvist.com")
     end
 
     def getCheckLists
@@ -16,7 +17,7 @@ module Jot
 
     def json_call url, parameters = nil
     
-      res = open(@host.to_s + url, :http_basic_authentication => [@email, @api_key])
+      res = open(HOST + url, :http_basic_authentication => [@email, @api_key])
     
       JSON.parse(res.string)
 

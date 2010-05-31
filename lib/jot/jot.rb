@@ -3,8 +3,9 @@ module Jot
 
     class Jot
 
-    EMPTY_PREFIX = "   "
-    CURRENT_PREFIX = " * "
+    CURRENT_MARKER = "*"
+    CURRENT_PREFIX = " #{CURRENT_MARKER} "
+    EMPTY_PREFIX = " " * CURRENT_PREFIX.length
 
     def initialize(workspace)
       @output = workspace.output_stream
