@@ -15,12 +15,15 @@ module Jot
       json_call "/checklists.json"
     end
 
+    def get_tasks_for list
+      json_call "/checklists/#{list["id"]}/tasks.json"
+    end
+
     def json_call url, parameters = nil
     
       res = open(HOST + url, :http_basic_authentication => [@email, @api_key])
     
       JSON.parse(res.string)
-
     end
     
   end

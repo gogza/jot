@@ -9,6 +9,10 @@ module Jot
       lists = @proxy.getCheckLists
       lists.map{|list| list["name"]}
     end
+
+    def tasks_for list
+      @proxy.get_tasks_for list
+    end
   end
 
 end

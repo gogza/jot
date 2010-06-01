@@ -8,3 +8,9 @@
 
 * Features Added
   * View the configuration
+
+== 0.2.0 / 2010-06-01
+
+* Features Added
+  * Edit the configuration
+  * Display a non-hierarchical list of tasks for the current list

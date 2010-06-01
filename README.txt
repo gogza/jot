@@ -8,6 +8,7 @@ a little list making command line tool that uses Checkvist to store its lists
 
 == FEATURES/PROBLEMS:
 
+* configure jot to work with checkvist
 * add items to a list at the command line
 
 == SYNOPSIS:

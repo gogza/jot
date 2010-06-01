@@ -28,7 +28,9 @@ module Jot
 	cmd = @command_hash[:command]
 	opts = @command_hash[:opts]
 
-	if cmd == "lists"
+	if cmd == "tasks"
+          jot.show_tasks
+	elsif cmd == "lists"
           if opts[:list_name] == ""
   	    jot.show_lists
 	  else
@@ -59,11 +61,13 @@ module Jot
       private
       
       def build_command_hash(args)
-	cmd = args.shift
+	cmd = args.length == 0 ? "tasks" : args.shift 
 
         command_hash = Hash[:command => cmd]
 
 	opts = case cmd
+          when "tasks"
+	    nil	  
 	  when "lists"    
 	    Hash[:list_name => args * " "]
 	  when "config"

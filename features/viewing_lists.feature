@@ -10,10 +10,10 @@ Feature: Viewer wants to see their lists
      | joebloggs | ABC1234567 | CheckvistProxy |
 
   Scenario: viewing multiple lists
-    Given I have an existing list with:
-     | name         |
-     | Garden tasks |
-     | House tasks  |
+    Given Checkvist has the existing lists:
+     | name         | id |
+     | Garden tasks | 12 |
+     | House tasks  | 13 |
     And jot knows "Garden tasks" is the current list
     When I ask to see the lists
     Then jot should display the following lists:
@@ -24,18 +24,18 @@ Feature: Viewer wants to see their lists
     And jot should not mark the "House tasks" as current  
 
   Scenario: viewing a single list
-    Given I have an existing list with:
-     | name         |
-     | Garden tasks |
+    Given Checkvist has the existing lists:
+     | name         | id |
+     | Garden tasks | 12 |
     When I ask to see the lists
     Then jot should show the "Garden tasks" list
     And jot should mark the "Garden tasks" as current
 
   Scenario: viewing multiple lists when a current list is not set
-    Given I have an existing list with:
-     | name         |
-     | Garden tasks |
-     | House tasks  |
+    Given Checkvist has the existing lists:
+     | name         | id |
+     | Garden tasks | 12 |
+     | House tasks  | 13 |
     And none of the lists are marked as current
     When I ask to see the lists
     Then jot should display the following lists:

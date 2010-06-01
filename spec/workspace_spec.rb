@@ -32,12 +32,13 @@ module Jot
     end
 
     def create_test_state_file
-      File.open(STATE_FILENAME, 'w') {|f| f.write(Hash["currentList" => nil].to_yaml)}
+      File.open(STATE_FILENAME, 'w') {|f| f.write(Hash["currentList" => "Garden Tasks", "currentListId" => 12].to_yaml)}
     end
     
     describe "when managing configuration" do
       before(:each) do
 	hide_original_config_file
+    	@output = mock("output").as_null_object
       end
 
       after(:each) do
@@ -49,7 +50,6 @@ module Jot
 	context "and the config file is trying to be accessed" do
 
 	  it "creates a new empty config file" do
-    	    @output = mock("output").as_null_object
 	    @workspace = WorkSpace.new(@output)
             File.exist?(CONFIG_FILENAME).should == true
 	  end
@@ -65,7 +65,6 @@ module Jot
 
         context "and we are updating the config file" do
           before(:each) do
-    	    @output = mock("output").as_null_object
   	    @workspace = WorkSpace.new(@output)
   	    new_config = Hash["email" => "ben@bloggs.com", "api" => "4321"]
 	    @workspace.configuration = new_config
@@ -83,7 +82,6 @@ module Jot
 
         context "and we are reading the config file" do
           before(:each) do
-	    @output = mock("output").as_null_object
 	    @workspace = WorkSpace.new(@output)
           end
 
@@ -116,7 +114,6 @@ module Jot
 	context "and the state is trying to be accessed" do
 
 	  it "creates a new empty state file" do
-    	    @output = mock("output").as_null_object
 	    @workspace = WorkSpace.new(@output)
             File.exist?(STATE_FILENAME).should == true
 	  end
@@ -132,7 +129,6 @@ module Jot
 
         context "and we are identifying the current list" do
           before(:each) do
-    	    @output = mock("output").as_null_object
 	    @workspace = WorkSpace.new(@output)
           end
           it "identifies that the list is the current one" do
@@ -144,7 +140,15 @@ module Jot
 	    @workspace.isCurrentList?("Not this one").should == false
           end
 
-        end      
+        end
+
+	context "and we want the current list's unique id" do
+	  it "should find the correct id" do
+	    @workspace = WorkSpace.new(@output)
+	    current_list = @workspace.get_current_list
+	    current_list.should == 12
+	  end
+	end
 
       end
 

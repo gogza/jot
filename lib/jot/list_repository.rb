@@ -9,6 +9,11 @@ module Jot
       @workspace = workspace
       @provider = workspace.provider
     end
+
+    def get_current_tasks
+      current_list = @workspace.get_current_list
+      @provider.tasks_for({"id" => current_list})
+    end
     
     def getLists
     

@@ -41,6 +41,10 @@ module Jot
       @state["currentList"] == listName
 
     end
+
+    def get_current_list
+      @state["currentListId"]	    
+    end
    
     def configuration
       @config.to_hash

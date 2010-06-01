@@ -9,7 +9,23 @@ module Jot::Cli
       input.shift if input[0] == "jot"
       @output = mock("output").as_null_object
       Main.new(input,@output)
-    end	   
+    end
+
+    context "processing a default function" do
+      before(:each) do
+        @jot = mock("jot").as_null_object
+        Main.should_receive(:create_jot).and_return(@jot)
+      end
+      it "puts the tasks command in the hash" do
+	main = execute_cli "jot" 
+	main.command_hash[:command].should == "tasks"
+      end
+      it "tells jot to show the tasks" do
+        @jot.should_receive(:show_tasks)
+	main = execute_cli "jot" 
+      end
+
+    end
 
     context "processing configuration command" do
       before(:each) do

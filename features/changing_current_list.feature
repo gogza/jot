@@ -8,10 +8,10 @@ Feature: Changing the current list
     And I have a configuration file containing:
      | email          | api        | proxy          |
      | joe@bloggs.com | ABC1234567 | CheckvistProxy |
-    And I have an existing list with:
-     | name         |
-     | Garden tasks |
-     | House tasks  |
+    And Checkvist has the existing lists:
+     | name         | id |
+     | Garden tasks | 12 |
+     | House tasks  | 13 |
     And jot knows "Garden tasks" is the current list
 
   Scenario: changing to another list using exact name

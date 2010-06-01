@@ -3,23 +3,22 @@ Given /^I want to output to a string$/ do
   @output = StringIO.new
   FakeWeb.allow_net_connect = false
   FakeWeb.clean_registry
+
 end
 
-Given /^I have an existing list with:$/ do |table|
+Given /^Checkvist has the existing lists:$/ do |table|
 
-  #@user = "mail.gordon.mcallister%40gmail.com"
-  #@password = "clsg9rHHPZK46pxIqMilcIAuGMftKtUNh5vMaCAs"
-
-  json_array = table.hashes.map {|hash| build_json hash[:name]}
+  @lists = table.hashes	
+  json_array = @lists.map {|list| build_json list}
   
   json = "[#{json_array * ","}]"
  
-  FakeWeb.register_uri (:get, "http://#{escape(@user)}:#{escape(@password)}@checkvist.com/checklists.json", :body => json)
+  FakeWeb.register_uri(:get, "http://#{escape(@user)}:#{escape(@password)}@checkvist.com/checklists.json", :body => json)
 
 end
 
-def build_json name
-  "{\"name\":\"#{name}\",\"updated_at\":\"2010/04/19 18:45:22 +0000\",\"public\":true,\"id\":32457,\"task_completed\":0,\"task_count\":2}"
+def build_json list
+  "{\"name\":\"#{list["name"]}\",\"updated_at\":\"2010/04/19 18:45:22 +0000\",\"public\":true,\"id\":#{list["id"]},\"task_completed\":0,\"task_count\":2}"
 end
 
 def escape parameter
@@ -27,7 +26,8 @@ def escape parameter
 end
 
 Given /^jot knows "([^\"]*)" is the current list$/ do |list_name|
-  File.open(STATE_FILENAME,'w') {|f| f.write Hash["currentList" => list_name].to_yaml}
+  list_id = (@lists.select {|list| list["name"] == list_name } ).first["id"]
+  File.open(STATE_FILENAME,'w') {|f| f.write({"currentList" => list_name, "currentListId" => list_id}.to_yaml)}
 end
 
 Given /^none of the lists are marked as current$/ do
@@ -102,19 +102,19 @@ Then /^the jot workspace should have the "([^\"]*)" list marked as current$/ do
 end
 
 Then /^jot should display a message saying "([^\"]*)"$/ do |message|
-  @output.string.should =~ Regexp.new(message)
+  Then "jot should display this phrase \"#{message}\""
 end
 
 Then /^jot should display the following:$/ do |table|
-  table.hashes.each{|hash| Then "jot should display a message saying \"#{hash[:displayed]}\""}
+  table.hashes.each{|hash| Then "jot should display this phrase \"#{hash[:displayed]}\""}
 end
 
 Then /^the configuration file should contain the following:$/ do |table|
   table.hashes.each{|hash| File.read("jot.config").should =~ Regexp.new(hash["value"])}	
 end
 
-Then /^jot should visit the "([^\"]*)" url$/ do |url|
-  Jot::CheckvistProxyMock.has_visited(url).should == true
+Then /^jot should display this phrase "([^\"]*)"$/ do |message|
+  @output.string.should =~ Regexp.new(message)
 end
 
 

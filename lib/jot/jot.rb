@@ -18,6 +18,12 @@ module Jot
       display_lists
     end
 
+    def show_tasks
+      @output.puts
+      tasks = @repository.get_current_tasks
+      tasks.each {|task| @output.puts task["content"]}
+    end
+
     def changeCurrentListTo listName
       @output.puts
       begin
