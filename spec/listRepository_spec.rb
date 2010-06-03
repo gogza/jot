@@ -10,13 +10,14 @@ module Jot
 
     describe "when getting lists" do
       before(:each) do
-        @provider.should_receive(:lists).and_return(["Garden tasks", "House tasks"])
+	@garden_list = {"id" => 12, "name" => "Garden tasks"}
+	@house_list = {"id" => 13, "name" => "House tasks"}
+        @provider.should_receive(:lists).and_return([@garden_list, @house_list])
       end
 
       context "and current is set in system state" do
         before(:each) do
-	  @workspace.should_receive(:isCurrentList?).with("Garden tasks").and_return(true)
-          @workspace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+	  @workspace.should_receive(:get_current_list).and_return(@garden_list["id"])
 
 	  @repository = ListRepository.new(@workspace)
         end
@@ -28,30 +29,29 @@ module Jot
       
         it "should show the garden list" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/Garden tasks/}.length.should == 1
+          @lists.select{|list|list["name"] =~/Garden tasks/}.length.should == 1
         end
 
         it "should show the house list" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/House tasks/}.length.should == 1
+          @lists.select{|list|list["name"] =~/House tasks/}.length.should == 1
         end
 
         it "should mark the garden list as current" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/Garden tasks/}.first[:current].should == true
+          @lists.select{|list|list["name"] =~/Garden tasks/}.first["current"].should == true
         end
 
         it "should not mark the house list as current" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/House tasks/}.first[:current].should == false
+          @lists.select{|list|list["name"] =~/House tasks/}.first["current"].should == false
         end
 
       end
 
       context "and current is not set in system state" do
         before(:each) do
-	  @workspace.should_receive(:isCurrentList?).with("Garden tasks").and_return(false)
-          @workspace.should_receive(:isCurrentList?).with("House tasks").and_return(false)
+	  @workspace.should_receive(:get_current_list).and_return(nil)
 	  @repository = ListRepository.new(@workspace)
         end
 
@@ -61,17 +61,17 @@ module Jot
 
         it "should show the garden list" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/Garden tasks/}.length.should == 1
+          @lists.select{|list|list["name"] =~/Garden tasks/}.length.should == 1
         end
 
         it "should show the house list" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:name] =~/House tasks/}.length.should == 1
+          @lists.select{|list|list["name"] =~/House tasks/}.length.should == 1
         end
 
         it "should mark one of the lists as current" do
           @lists = @repository.getLists
-          @lists.select{|list|list[:current]}.length.should == 1
+          @lists.select{|list|list["current"]}.length.should == 1
         end
 
       end

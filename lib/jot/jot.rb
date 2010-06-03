@@ -24,12 +24,12 @@ module Jot
       tasks.each {|task| @output.puts task["content"]}
     end
 
-    def changeCurrentListTo listName
+    def change_current_list_to list_name
       @output.puts
       begin
 
-        list = @repository.findSingleList listName
-	@repository.makeCurrent list
+        list = @repository.find_single_list list_name
+	@repository.make_current_list list
 
       rescue MoreThanOneMatchError
         @output.puts "Hold on! Jot found more than one matching list.\n\n"
@@ -57,9 +57,10 @@ module Jot
     def display_lists
       @lists = @repository.getLists
 
+      #fail "@lists is not a Array: it is a #{@lists.class}!" if @lists.class != Array
       @lists.each {|list| 
-	prefix = list[:current] ? CURRENT_PREFIX : EMPTY_PREFIX
-        @output.puts prefix + list[:name] 
+	prefix = list["current"] ? CURRENT_PREFIX : EMPTY_PREFIX
+        @output.puts prefix + list["name"]
       }
     end
 

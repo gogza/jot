@@ -34,7 +34,7 @@ module Jot
           if opts[:list_name] == ""
   	    jot.show_lists
 	  else
-	    jot.changeCurrentListTo opts[:list_name]
+	    jot.change_current_list_to opts[:list_name]
           end
 	elsif cmd == "config"
           if opts[:email] == nil

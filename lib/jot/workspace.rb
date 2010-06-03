@@ -7,7 +7,7 @@ module Jot
       @output = output_stream
 
       @config = PersistantHash.new(CONFIG_FILENAME, Hash["email" => nil, "api" => nil])
-      @state = PersistantHash.new(STATE_FILENAME,  Hash["currentList" => nil])
+      @state = PersistantHash.new(STATE_FILENAME,  Hash["currentListId" => nil])
 
       @proxy_class = @config["proxy"] == nil ? CheckvistProxy : Kernel.const_get("Jot").const_get(@config["proxy"])
 
@@ -28,22 +28,22 @@ module Jot
       @provider
     end
 
-    def currentList= listName
+    def currentList= list_id
       
-      @state["currentList"]= listName
+      @state["currentListId"] = list_id.to_i
 
       @state.save
 
     end
 
-    def isCurrentList? listName
+    def isCurrentList? list
 
-      @state["currentList"] == listName
+      @state["currentListId"] == list["id"]
 
     end
 
     def get_current_list
-      @state["currentListId"]	    
+      @state["currentListId"] == nil ? nil : @state["currentListId"].to_i
     end
    
     def configuration

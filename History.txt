@@ -14,3 +14,8 @@
 * Features Added
   * Edit the configuration
   * Display a non-hierarchical list of tasks for the current list
+
+== 0.2.001 / 2010-06-03
+
+* Refactor
+  * Used Checkvist list Id to identify lists

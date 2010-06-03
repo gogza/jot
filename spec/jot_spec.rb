@@ -51,7 +51,7 @@ module Jot
 
       context "viewing list" do
         before(:each) do
-      	  list = [Hash[:current => true, :name => "Garden tasks"], Hash[:current => false, :name => "House tasks"]]
+      	  list = [Hash["current" => true, "name" => "Garden tasks"], Hash["current" => false, "name" => "House tasks"]]
 
    	  @repository.should_receive(:getLists).and_return(list)
 
@@ -76,6 +76,29 @@ module Jot
         end
 
       end
+	
+      context "changing the current list" do
+        before(:each) do 
+	  @list_name = "House tasks"
+	  @list = {"id" => 13, "name" => @list_name}	
+	  @jot = Jot.new(@workspace)
+	end
+
+      	it "should find the list from the repository" do
+  	  @repository.should_receive(:find_single_list).with(@list_name).and_return(@list)
+ 	  @jot.change_current_list_to @list_name
+        end
+	      
+        it "should get the repository to make the list current" do
+  	  @repository.should_receive(:find_single_list).with(@list_name).and_return(@list)
+	  @repository.should_receive(:make_current_list).with(@list)
+
+ 	  @jot.change_current_list_to @list_name
+        end
+
+		
+      end
+
 
       describe "viewing tasks" do
 

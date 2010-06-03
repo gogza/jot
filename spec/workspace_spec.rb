@@ -32,7 +32,7 @@ module Jot
     end
 
     def create_test_state_file
-      File.open(STATE_FILENAME, 'w') {|f| f.write(Hash["currentList" => "Garden Tasks", "currentListId" => 12].to_yaml)}
+      File.open(STATE_FILENAME, 'w') {|f| f.write(Hash["currentListId" => 12].to_yaml)}
     end
     
     describe "when managing configuration" do
@@ -132,12 +132,12 @@ module Jot
 	    @workspace = WorkSpace.new(@output)
           end
           it "identifies that the list is the current one" do
-            @workspace.currentList = "This one"
-	    @workspace.isCurrentList?("This one").should == true
+            @workspace.currentList = 12
+	    @workspace.isCurrentList?({"id" =>12}).should == true
           end
           it "identifies that the list is not the current one" do
-            @workspace.currentList = "This one"
-	    @workspace.isCurrentList?("Not this one").should == false
+            @workspace.currentList = 12
+	    @workspace.isCurrentList?({"id" =>13}).should == false
           end
 
         end

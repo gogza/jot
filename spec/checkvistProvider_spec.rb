@@ -15,12 +15,14 @@ module Jot
 	@provider = CheckvistListProvider.new(@proxy)
       end
 
-      it "should show the house list" do
-        @provider.lists.should include("House tasks")
+      it "should provide the House list" do
+        house_lists = @provider.lists.select {|list| list["name"] =~ /House tasks/ }
+	house_lists.length.should == 1
       end
 
-      it "should provide the garden list" do
-        @provider.lists.should include("Garden tasks")
+      it "should provide the Garden list" do
+        garden_lists = @provider.lists.select {|list| list["name"] =~ /Garden tasks/ }
+	garden_lists.length.should == 1
       end
 
     end
