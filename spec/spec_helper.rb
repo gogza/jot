@@ -2,6 +2,9 @@
 require File.expand_path(
     File.join(File.dirname(__FILE__), %w[.. lib jot]))
 
+require File.expand_path(
+    File.join(File.dirname(__FILE__), %w[.. spec support json_builders]))
+    
 Spec::Runner.configure do |config|
   # == Mock Framework
   #

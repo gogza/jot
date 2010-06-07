@@ -1,4 +1,3 @@
-
 module Jot
 
     class Jot
@@ -21,7 +20,23 @@ module Jot
     def show_tasks
       @output.puts
       tasks = @repository.get_current_tasks
-      tasks.each {|task| @output.puts task["content"]}
+
+      if tasks == nil
+        @output.puts "<empty>" 
+	return
+      end
+
+      display_tasks tasks
+    end
+
+    def display_tasks tasks, no_of_spaces = 3
+      tasks.each do |task|
+	prefix = " " * no_of_spaces 
+        @output.puts(prefix + task["content"])
+	if task["children"] != nil
+	  display_tasks task["children"], no_of_spaces + 2
+	end
+      end
     end
 
     def change_current_list_to list_name
@@ -56,12 +71,12 @@ module Jot
 
     def display_lists
       @lists = @repository.getLists
-
-      #fail "@lists is not a Array: it is a #{@lists.class}!" if @lists.class != Array
+      
       @lists.each {|list| 
 	prefix = list["current"] ? CURRENT_PREFIX : EMPTY_PREFIX
         @output.puts prefix + list["name"]
       }
+
     end
 
   end

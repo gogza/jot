@@ -8,17 +8,12 @@ end
 
 Given /^Checkvist has the existing lists:$/ do |table|
 
-  @lists = table.hashes	
-  json_array = @lists.map {|list| build_json list}
-  
-  json = "[#{json_array * ","}]"
+  @lists = table.hashes
+
+  json = build_json_lists @lists
  
   FakeWeb.register_uri(:get, "http://#{escape(@user)}:#{escape(@password)}@checkvist.com/checklists.json", :body => json)
 
-end
-
-def build_json list
-  "{\"name\":\"#{list["name"]}\",\"updated_at\":\"2010/04/19 18:45:22 +0000\",\"public\":true,\"id\":#{list["id"]},\"task_completed\":0,\"task_count\":2}"
 end
 
 def escape parameter

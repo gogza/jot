@@ -118,6 +118,21 @@ module Jot
           end
         end
 
+        context "when there are no tasks" do
+          before(:each) do 
+            @repository.should_receive(:get_current_tasks).and_return(nil)
+  	    @jot = Jot.new(@workspace)
+          end
+		
+          it "should get the current tasks from the repository" do
+            @jot.show_tasks
+          end
+          it "should show all the tasks" do
+  	    @output.should_receive(:puts).with(/<empty>/)      
+            @jot.show_tasks
+          end
+        end
+
         context "when there are more than one task" do
           before(:each) do 
   	    tasks = [{"content" => "Cut the grass"}, {"content" => "Trim the hedge"}]
@@ -134,6 +149,24 @@ module Jot
             @jot.show_tasks
           end
         end
+
+	context "when there are hierarchical tasks" do
+	  before(:each) do
+            child_tasks = [{"id" => 12, "content" => "Cut the grass", "children" => nil},{"id" => 13, "content" => "Trim the hedge", "children" => nil}]
+  	    tasks = [{"id" => 20, "content" => "Tidy up", "children" => child_tasks}]
+            @repository.should_receive(:get_current_tasks).and_return(tasks)
+  	    @jot = Jot.new(@workspace)		  
+          end
+          it "should get the current tasks from the repository" do
+            @jot.show_tasks
+          end
+          it "should show all the tasks hierarchically" do
+  	    @output.should_receive(:puts).with(/   Tidy up/)      
+  	    @output.should_receive(:puts).with(/     Cut the grass/)      
+  	    @output.should_receive(:puts).with(/     Trim the hedge/)      
+            @jot.show_tasks
+	  end
+	end
 
       end
 

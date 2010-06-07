@@ -5,4 +5,5 @@ require 'spec/mocks'
 require 'jot'
 require 'ftools'
 require 'fakeweb'
+require 'spec/support/json_builders'
 

@@ -11,8 +11,24 @@ module Jot
     end
 
     def get_current_tasks
+
       current_list = @workspace.get_current_list
-      @provider.tasks_for({"id" => current_list})
+      tasks = @provider.tasks_for({"id" => current_list})
+
+      hierarchically_organize tasks
+
+    end
+
+    def hierarchically_organize tasks, parent_id = 0
+      children = tasks.select {|task| task["parent_id"] == parent_id}
+
+      return nil if children.empty?
+
+      children.map do |task|
+        task["children"] = hierarchically_organize tasks, task["id"]
+      end
+
+      return children
     end
     
     def getLists

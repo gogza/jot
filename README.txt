@@ -8,13 +8,34 @@ a little list making command line tool that uses Checkvist to store its lists
 
 == FEATURES/PROBLEMS:
 
-* configure jot to work with checkvist
-* add items to a list at the command line
+* configure jot to work with Checkvist
+* switch between lists on Checkvist
+* display hierarchical lists
 
 == SYNOPSIS:
 
-  jot "Wash the car"
-  jot "Mow the lawn"
+  #configure jot for Checkvist
+  jot config -e <your email address> -a <your Checkvist API key>
+
+  #display your checklists
+  jot lists
+  
+  # * list One
+  #   list Two
+
+  #change the current list to list_two
+  jot lists T # matches Regular expressions
+
+  #   list One
+  # * list Two
+
+  #show the list contents
+  jot
+
+  #   thing to do 1
+  #   thing to do 2
+  #     thing to do 3 - thing to do 2 depends on me!
+  #   thing to do 4
 
 
 == REQUIREMENTS:
@@ -23,7 +44,7 @@ a little list making command line tool that uses Checkvist to store its lists
 
 == INSTALL:
 
-* sudo gem install jot
+* checkout this repo for now
 
 == LICENSE:
 

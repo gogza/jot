@@ -16,7 +16,13 @@ Feature: Viewer wants to see the tasks on the current lists
 
   @wip
   Scenario: viewing the current list
-    Given the current list has the following tasks "Cut the grass"
+    Given the current list has the following tasks:
+     | content         | id | children | parent |
+     | Tidy up         | 20 | 10,11    | 0      |
+     | Cut the grass   | 10 |          | 20     |
+     | Trim the hedge  | 11 |          | 20     |
     When I ask to see the tasks for the current list
-    Then jot should display this phrase "Cut the grass"
+    Then jot should display this phrase "   Tidy up"
+    Then jot should display this phrase "     Cut the grass"
+    Then jot should display this phrase "     Trim the hedge"
 

@@ -19,3 +19,9 @@
 
 * Refactor
   * Used Checkvist list Id to identify lists
+
+== 0.3.0 / 2010-06-07
+
+* Features Added
+  * Display a hierarchical list of tasks for the current list
+
